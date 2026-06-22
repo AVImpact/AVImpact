@@ -3,7 +3,7 @@ import { sanitizeString } from "../utils/sanitize";
 export type LeadPayload = Record<string, string | number | boolean | undefined | null>;
 
 const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
-const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+const WEB3FORMS_ACCESS_KEY = "e0189a44-04ca-4fd7-ba0c-d3bcc1a1275e";
 
 const leadSubjects: Record<string, string> = {
   "scroll-email": "New Quick Email Lead - AV Impact",
