@@ -608,7 +608,9 @@ export default function CompanyProfile({ navigate }: CompanyProfileProps) {
                     <Mail size={13} />
                   </span>
                   <span className="text-[8px] text-[#6c98ff] font-bold uppercase tracking-wider">Email Inquiry</span>
-                  <span className="text-[11px] font-bold text-white tracking-wide font-sans">av.info4u@gmail.com</span>
+                  <a href="mailto:sales@avimpact.in" className="text-[11px] font-bold text-white tracking-wide font-sans hover:text-[#6c98ff] transition-colors cursor-pointer">
+                    sales@avimpact.in
+                  </a>
                 </div>
                 <div className="flex flex-col gap-1.5 bg-white/5 border border-white/10 rounded-xl p-3.5 text-center">
                   <span className="w-7 h-7 rounded-full bg-[#2559bd]/25 text-[#6c98ff] flex items-center justify-center mx-auto mb-1">

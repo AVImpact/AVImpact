@@ -25,7 +25,11 @@ import {
   Landmark,
   School,
   ShoppingBag,
-  Home as HomeIcon
+  Home as HomeIcon,
+  X,
+  ExternalLink,
+  Copy,
+  Check
 } from "lucide-react";
 import { NetworkBackground } from "../components/visualizers/NetworkBackground";
 import { Footer } from "../components/layout/Footer";
@@ -54,6 +58,56 @@ export default function Contact({ navigate }: { navigate: (path: string) => void
   });
   const [showOptionalFields, setShowOptionalFields] = useState(false);
   const [projectTimeline, setProjectTimeline] = useState("");
+  const [emailCopied, setEmailCopied] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+
+  const handleEmailClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const emailStr = "sales@avimpact.in";
+    
+    // Redirect to Gmail Web Compose in a new tab
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${emailStr}`, "_blank", "noopener,noreferrer");
+
+    const fallbackCopy = () => {
+      const textArea = document.createElement("textarea");
+      textArea.value = emailStr;
+      textArea.style.position = "fixed";
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        const successful = document.execCommand("copy");
+        if (successful) {
+          setEmailCopied(true);
+          setTimeout(() => setEmailCopied(false), 3000);
+        }
+      } catch (err) {
+        console.error("Fallback copy failed:", err);
+      }
+      document.body.removeChild(textArea);
+    };
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(emailStr)
+          .then(() => {
+            setEmailCopied(true);
+            setTimeout(() => setEmailCopied(false), 3000);
+          })
+          .catch((err) => {
+            console.error("Failed to write to clipboard via API:", err);
+            fallbackCopy();
+          });
+      } else {
+        fallbackCopy();
+      }
+    } catch (err) {
+      console.error("Failed to copy email:", err);
+      fallbackCopy();
+    }
+  };
 
   const formRef = useRef<HTMLDivElement>(null);
   useSEO("/contact");
@@ -329,14 +383,15 @@ export default function Contact({ navigate }: { navigate: (path: string) => void
                 <p className="text-slate-500 text-xs md:text-sm leading-relaxed">
                   Send formal RFPs, blueprints, and detailed layouts.
                 </p>
-                <div className="text-xs md:text-sm font-bold text-slate-700">av.info4u@gmail.com</div>
+                <div className="text-xs md:text-sm font-bold text-slate-700">sales@avimpact.in</div>
               </div>
-              <a
-                href="mailto:av.info4u@gmail.com"
-                className="mt-6 w-full text-center py-2.5 bg-slate-50 hover:bg-amber-500/5 hover:text-amber-500 text-[#0d1b3e] rounded-lg font-bold text-xs md:text-sm transition-colors cursor-pointer"
+              <button
+                type="button"
+                onClick={() => setShowEmailModal(true)}
+                className="mt-6 w-full text-center py-2.5 bg-slate-50 hover:bg-amber-500/5 hover:text-amber-500 text-[#0d1b3e] rounded-lg font-bold text-xs md:text-sm transition-colors cursor-pointer border-none"
               >
                 Send Email
-              </a>
+              </button>
             </div>
 
             {/* BOOK CONSULTATION */}
@@ -748,7 +803,9 @@ export default function Contact({ navigate }: { navigate: (path: string) => void
                 <Mail size={18} className="text-[#2559bd] flex-shrink-0 mt-0.5" />
                 <div>
                   <div className="text-[#0d1b3e] font-bold">Sales Desk</div>
-                  <p className="text-slate-500 font-medium">av.info4u@gmail.com</p>
+                  <a href="mailto:sales@avimpact.in" className="text-slate-500 font-medium hover:text-[#2559bd] transition-colors">
+                    sales@avimpact.in
+                  </a>
                 </div>
               </div>
             </div>
@@ -830,6 +887,121 @@ export default function Contact({ navigate }: { navigate: (path: string) => void
 
       {/* Footer Component */}
       <Footer navigate={navigate} />
+
+      {/* Professional Email Client Selection Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 bg-[#0d1b3e]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300">
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl relative animate-fade-in text-center space-y-6">
+            <button
+              onClick={() => setShowEmailModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer border-none bg-transparent"
+              aria-label="Close modal"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="w-12 h-12 rounded-full bg-[#2559bd]/15 text-[#2559bd] flex items-center justify-center mx-auto">
+              <Mail size={24} />
+            </div>
+
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-black text-[#0d1b3e]">Contact Sales Desk</h3>
+              <p className="text-slate-500 text-xs font-semibold leading-relaxed">
+                Compose an email to <span className="text-[#2559bd] font-bold">sales@avimpact.in</span> using one of the channels below:
+              </p>
+            </div>
+
+            <div className="space-y-3 pt-2">
+              {/* Option 1: Outlook Web */}
+              <button
+                onClick={() => {
+                  window.open("https://outlook.live.com/mail/0/deeplink/compose?to=sales@avimpact.in", "_blank", "noopener,noreferrer");
+                  setShowEmailModal(false);
+                }}
+                className="w-full py-3.5 px-4 bg-slate-50 hover:bg-[#0078d4]/10 border border-slate-100 hover:border-[#0078d4]/20 rounded-xl font-extrabold text-xs md:text-sm text-[#0d1b3e] flex items-center gap-3 transition-all active:scale-98 cursor-pointer text-left border-none"
+              >
+                <span className="w-8 h-8 rounded-lg bg-[#0078d4]/10 text-[#0078d4] flex items-center justify-center shrink-0">
+                  <Mail size={16} />
+                </span>
+                <div className="flex-1">
+                  <div className="font-bold text-slate-800 text-xs md:text-sm">Outlook Web</div>
+                  <div className="text-[10px] text-slate-400 font-semibold leading-none mt-0.5">Use Office 365 / Outlook.com</div>
+                </div>
+                <ExternalLink size={14} className="text-slate-400" />
+              </button>
+
+              {/* Option 2: Gmail Web */}
+              <button
+                onClick={() => {
+                  window.open("https://mail.google.com/mail/?view=cm&fs=1&to=sales@avimpact.in", "_blank", "noopener,noreferrer");
+                  setShowEmailModal(false);
+                }}
+                className="w-full py-3.5 px-4 bg-slate-50 hover:bg-rose-500/10 border border-slate-100 hover:border-rose-500/20 rounded-xl font-extrabold text-xs md:text-sm text-[#0d1b3e] flex items-center gap-3 transition-all active:scale-98 cursor-pointer text-left border-none"
+              >
+                <span className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
+                  <Mail size={16} />
+                </span>
+                <div className="flex-1">
+                  <div className="font-bold text-slate-800 text-xs md:text-sm">Gmail (Webmail)</div>
+                  <div className="text-[10px] text-slate-400 font-semibold leading-none mt-0.5">Compose in your browser</div>
+                </div>
+                <ExternalLink size={14} className="text-slate-400" />
+              </button>
+
+              {/* Option 3: Default Mail App */}
+              <a
+                href="mailto:sales@avimpact.in"
+                onClick={() => setShowEmailModal(false)}
+                className="w-full py-3.5 px-4 bg-slate-50 hover:bg-[#2559bd]/10 border border-slate-100 hover:border-[#2559bd]/20 rounded-xl font-extrabold text-xs md:text-sm text-[#0d1b3e] flex items-center gap-3 transition-all active:scale-98 cursor-pointer text-left no-underline"
+              >
+                <span className="w-8 h-8 rounded-lg bg-[#2559bd]/10 text-[#2559bd] flex items-center justify-center shrink-0">
+                  <Mail size={16} />
+                </span>
+                <div className="flex-1">
+                  <div className="font-bold text-slate-800 text-xs md:text-sm">Default Email App</div>
+                  <div className="text-[10px] text-slate-400 font-semibold leading-none mt-0.5">Launch Outlook, Mail app, etc.</div>
+                </div>
+                <ExternalLink size={14} className="text-slate-400" />
+              </a>
+
+              {/* Option 4: Copy Email Address */}
+              <button
+                onClick={() => {
+                  try {
+                    navigator.clipboard.writeText("sales@avimpact.in");
+                    setEmailCopied(true);
+                    setTimeout(() => setEmailCopied(false), 3000);
+                  } catch (err) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = "sales@avimpact.in";
+                    textArea.style.position = "fixed";
+                    textArea.style.opacity = "0";
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textArea);
+                    setEmailCopied(true);
+                    setTimeout(() => setEmailCopied(false), 3000);
+                  }
+                }}
+                className="w-full py-3.5 px-4 bg-slate-50 hover:bg-emerald-500/10 border border-slate-100 hover:border-emerald-500/20 rounded-xl font-extrabold text-xs md:text-sm text-[#0d1b3e] flex items-center gap-3 transition-all active:scale-98 cursor-pointer text-left border-none"
+              >
+                <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                  emailCopied ? "bg-emerald-500/20 text-emerald-600" : "bg-emerald-500/10 text-emerald-500"
+                }`}>
+                  {emailCopied ? <Check size={16} /> : <Copy size={16} />}
+                </span>
+                <div className="flex-1">
+                  <div className="font-bold text-slate-800 text-xs md:text-sm">
+                    {emailCopied ? "Address Copied!" : "Copy to Clipboard"}
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-semibold leading-none mt-0.5">Copy sales@avimpact.in</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

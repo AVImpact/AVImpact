@@ -394,8 +394,8 @@ export function Footer({ navigate }: FooterProps) {
               </li>
               <li className="flex gap-2.5 items-center">
                 <Mail size={16} className="text-blue-400 shrink-0" />
-                <a href="mailto:av.info4u@gmail.com" className="hover:text-blue-400 transition-colors">
-                  av.info4u@gmail.com
+                <a href="mailto:sales@avimpact.in" className="hover:text-blue-400 transition-colors">
+                  sales@avimpact.in
                 </a>
               </li>
               <li className="flex gap-2.5 items-start">
@@ -418,7 +418,7 @@ export function Footer({ navigate }: FooterProps) {
                 <Phone size={18} />
               </a>
               <a
-                href="mailto:av.info4u@gmail.com"
+                href="mailto:sales@avimpact.in"
                 className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-colors border border-white/10"
                 title="Email us"
                 aria-label="Email AV Impact"

@@ -127,4 +127,5 @@ The `dist/` output is a standard static site bundle and can be deployed to:
 **AV Impact**  
 101, Balaji Heights, Geeta Bhawan, Indore M.P, India 452001  
 📞 +91 9685453058  
-✉️ av.info4u@gmail.com
+✉️ sales@avimpact.in
+
