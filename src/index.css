@@ -247,7 +247,7 @@
   content: '';
   position: absolute;
   top: 0;
-  left: 50%;
+  left: 24px;
   transform: translateX(-50%);
   width: 2px;
   height: 100%;
@@ -259,7 +259,7 @@
 .timeline-active-fill {
   position: absolute;
   top: 0;
-  left: 50%;
+  left: 24px;
   transform: translateX(-50%);
   width: 2px;
   background: linear-gradient(to bottom, #2559bd, #6c98ff);
@@ -268,7 +268,16 @@
   will-change: height;
 }
 
+@media (min-width: 768px) {
+  .timeline-track::after,
+  .timeline-active-fill {
+    left: 50%;
+  }
+}
+
 .process-step {
+  position: relative;
+  z-index: 2;
   opacity: 0;
   transform: translateY(24px) scale(0.98);
   transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),

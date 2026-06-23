@@ -73,8 +73,8 @@ export function Navbar({ currentPath, navigate, activeSection = "" }: NavbarProp
           aria-label="AV Impact Home"
         >
           <AVImpactLogo 
-            height={110} 
-            className="h-[105px] md:h-[115px] -my-4 scale-[1.35] origin-left w-auto transition-all duration-300 transform group-hover:scale-[1.4]" 
+            height={80} 
+            className="h-16 sm:h-20 md:h-[80px] w-auto transition-all duration-300 transform group-hover:scale-105" 
           />
         </div>
 
@@ -181,7 +181,7 @@ export function Navbar({ currentPath, navigate, activeSection = "" }: NavbarProp
         <div className="flex items-center gap-3">
           <button
             onClick={() => handleModalOpen("quotation")}
-            className="bg-[#2559bd] text-white hover:bg-[#1f4a9e] px-5 py-2.5 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 hover-scale-sm cursor-pointer"
+            className="bg-[#2559bd] text-white hover:bg-[#1f4a9e] px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 hover-scale-sm cursor-pointer"
             aria-label="Request consultation"
           >
             Consultation
