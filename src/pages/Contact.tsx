@@ -912,43 +912,7 @@ export default function Contact({ navigate }: { navigate: (path: string) => void
             </div>
 
             <div className="space-y-3 pt-2">
-              {/* Option 1: Outlook Web */}
-              <button
-                onClick={() => {
-                  window.open("https://outlook.live.com/mail/0/deeplink/compose?to=sales@avimpact.in", "_blank", "noopener,noreferrer");
-                  setShowEmailModal(false);
-                }}
-                className="w-full py-3.5 px-4 bg-slate-50 hover:bg-[#0078d4]/10 border border-slate-100 hover:border-[#0078d4]/20 rounded-xl font-extrabold text-xs md:text-sm text-[#0d1b3e] flex items-center gap-3 transition-all active:scale-98 cursor-pointer text-left border-none"
-              >
-                <span className="w-8 h-8 rounded-lg bg-[#0078d4]/10 text-[#0078d4] flex items-center justify-center shrink-0">
-                  <Mail size={16} />
-                </span>
-                <div className="flex-1">
-                  <div className="font-bold text-slate-800 text-xs md:text-sm">Outlook Web</div>
-                  <div className="text-[10px] text-slate-400 font-semibold leading-none mt-0.5">Use Office 365 / Outlook.com</div>
-                </div>
-                <ExternalLink size={14} className="text-slate-400" />
-              </button>
-
-              {/* Option 2: Gmail Web */}
-              <button
-                onClick={() => {
-                  window.open("https://mail.google.com/mail/?view=cm&fs=1&to=sales@avimpact.in", "_blank", "noopener,noreferrer");
-                  setShowEmailModal(false);
-                }}
-                className="w-full py-3.5 px-4 bg-slate-50 hover:bg-rose-500/10 border border-slate-100 hover:border-rose-500/20 rounded-xl font-extrabold text-xs md:text-sm text-[#0d1b3e] flex items-center gap-3 transition-all active:scale-98 cursor-pointer text-left border-none"
-              >
-                <span className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
-                  <Mail size={16} />
-                </span>
-                <div className="flex-1">
-                  <div className="font-bold text-slate-800 text-xs md:text-sm">Gmail (Webmail)</div>
-                  <div className="text-[10px] text-slate-400 font-semibold leading-none mt-0.5">Compose in your browser</div>
-                </div>
-                <ExternalLink size={14} className="text-slate-400" />
-              </button>
-
-              {/* Option 3: Default Mail App */}
+              {/* Option 1: Default Mail App */}
               <a
                 href="mailto:sales@avimpact.in"
                 onClick={() => setShowEmailModal(false)}
@@ -964,7 +928,7 @@ export default function Contact({ navigate }: { navigate: (path: string) => void
                 <ExternalLink size={14} className="text-slate-400" />
               </a>
 
-              {/* Option 4: Copy Email Address */}
+              {/* Option 2: Copy Email Address */}
               <button
                 onClick={() => {
                   try {

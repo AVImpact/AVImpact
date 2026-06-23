@@ -53,16 +53,11 @@ export default function App() {
           <AppRoutes />
 
           {/* Sleek, persistent floating Company Profile download circle in the bottom-right corner */}
-          <Link 
-            to="/company-profile"
-            onClick={(e) => {
-              if (window.location.pathname === "/company-profile") {
-                e.preventDefault();
-                window.print();
-              }
-            }}
+          <a 
+            href="/AVIMPACT_Company_Profile.pdf"
+            download="AVIMPACT_Company_Profile.pdf"
             className="no-print fixed right-6 bottom-6 z-50 h-11 w-11 hover:w-36 bg-[#2559bd] text-[#ffffff] flex items-center justify-start px-3 rounded-full shadow-[0_8px_30px_rgba(37,89,189,0.35)] border border-white/20 hover:bg-[#1f4a9e] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer group overflow-hidden select-none"
-            title="Download/View Company Profile"
+            title="Download Company Profile"
           >
             <div className="flex items-center gap-2.5 min-w-max">
               <svg className="w-5 h-5 text-white shrink-0 group-hover:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -70,7 +65,7 @@ export default function App() {
               </svg>
               <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-sans font-bold text-[9px] uppercase tracking-wider">Company Profile</span>
             </div>
-          </Link>
+          </a>
         </BrowserRouter>
       </LeadProvider>
     </UIProvider>
