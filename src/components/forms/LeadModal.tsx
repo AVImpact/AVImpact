@@ -338,9 +338,9 @@ export function LeadModal() {
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Select Room Capacity</label>
                     <div className="grid grid-cols-1 gap-2.5">
                       {[
-                        { name: "Small", desc: "For 2-5 people. Ideal for team clusters and huddle rooms." },
-                        { name: "Medium", desc: "For 6-12 people. Ideal for conference rooms and collaboration hubs." },
-                        { name: "Large", desc: "For 13+ people. Suitable for large corporate boardrooms or auditoriums." }
+                        { name: "Small", desc: "For 2-5 students. Ideal for team clusters and huddle rooms." },
+                        { name: "Medium", desc: "For 6-12 students. Ideal for conference rooms and collaboration hubs." },
+                        { name: "Large", desc: "For 13+ students. Suitable for large corporate boardrooms or auditoriums." }
                       ].map((size) => (
                         <button
                           key={size.name}
