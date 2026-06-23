@@ -193,7 +193,7 @@ export function Footer({ navigate }: FooterProps) {
               </h5>
               <div className="flex gap-4 items-center">
                 <a
-                  href="https://linkedin.com"
+                  href="https://www.linkedin.com/company/av-impact/"
                   target="_blank"
                   rel="noreferrer"
                   className="w-10 h-10 rounded-full bg-[#0a66c2] hover:scale-110 flex items-center justify-center text-white transition-all shadow-md"
@@ -202,7 +202,7 @@ export function Footer({ navigate }: FooterProps) {
                   <Linkedin size={18} />
                 </a>
                 <a
-                  href="https://instagram.com"
+                  href="https://www.instagram.com/avimpact2026"
                   target="_blank"
                   rel="noreferrer"
                   className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#f58529] via-[#dd2a7b] to-[#8134af] hover:scale-110 flex items-center justify-center text-white transition-all shadow-md"
@@ -211,7 +211,7 @@ export function Footer({ navigate }: FooterProps) {
                   <Instagram size={18} />
                 </a>
                 <a
-                  href="https://facebook.com"
+                  href="https://www.facebook.com/avimpact2026/"
                   target="_blank"
                   rel="noreferrer"
                   className="w-10 h-10 rounded-full bg-[#1877f2] hover:scale-110 flex items-center justify-center text-white transition-all shadow-md"
