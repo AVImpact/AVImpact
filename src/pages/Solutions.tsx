@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useSEO } from "../hooks/useSEO";
 import {
   Check,
   ArrowDown,
@@ -112,109 +113,11 @@ export default function Solutions({ navigate }: { navigate: (path: string) => vo
     };
   }, []);
 
+  // Centralized SEO via useSEO hook
+  useSEO("/solutions");
+
   // Scroll reveal observer for elements
   useEffect(() => {
-    // -------------------------------------------------------------
-    // SEO & METADATA ARCHITECTURE FOR SOLUTIONS
-    // -------------------------------------------------------------
-    document.title = "Professional AV Integration & Boardroom Solutions | AV Impact";
-
-    // Canonical link
-    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-    if (!canonicalLink) {
-      canonicalLink = document.createElement("link");
-      canonicalLink.setAttribute("rel", "canonical");
-      document.head.appendChild(canonicalLink);
-    }
-    canonicalLink.setAttribute("href", window.location.origin + "/solutions");
-
-    // Meta Description
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement("meta");
-      metaDesc.setAttribute("name", "description");
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute("content", "Explore AV Impact's professional integration services: smart boardrooms, HyFlex classrooms, digital presentation auditoriums, command centers, and video conferencing.");
-
-    // Open Graph Tags
-    const ogTags = [
-      { property: "og:title", content: "Professional AV Integration & Boardroom Solutions | AV Impact" },
-      { property: "og:description", content: "Explore AV Impact's professional integration services: smart boardrooms, HyFlex classrooms, and video conferencing." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: window.location.origin + "/solutions" },
-      { property: "og:image", content: window.location.origin + "/assets/boardroom_after.webp" },
-      { name: "twitter:card", content: "summary_large_image" }
-    ];
-    ogTags.forEach((tag) => {
-      const selector = tag.property ? `meta[property="${tag.property}"]` : `meta[name="${tag.name}"]`;
-      let el = document.querySelector(selector);
-      if (!el) {
-        el = document.createElement("meta");
-        if (tag.property) el.setAttribute("property", tag.property);
-        if (tag.name) el.setAttribute("name", tag.name);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", tag.content);
-    });
-
-    // JSON-LD Service & Breadcrumb Schemas
-    const schemaScript = document.createElement("script");
-    schemaScript.type = "application/ld+json";
-    schemaScript.id = "solutions-structured-schema";
-    schemaScript.innerHTML = JSON.stringify([
-      {
-        "@context": "https://schema.org",
-        "@type": "Service",
-        "name": "Audio Visual Integration Services",
-        "serviceType": "AV Design and Installation",
-        "provider": {
-          "@type": "Organization",
-          "name": "AV Impact"
-        },
-        "areaServed": "IN",
-        "hasOfferCatalog": {
-          "@type": "OfferCatalog",
-          "name": "AV Solutions",
-          "itemListElement": [
-            {
-              "@type": "Offer",
-              "itemOffered": {
-                "@type": "Service",
-                "name": "Smart Boardrooms"
-              }
-            },
-            {
-              "@type": "Offer",
-              "itemOffered": {
-                "@type": "Service",
-                "name": "Advanced Learning Classrooms"
-              }
-            }
-          ]
-        }
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": window.location.origin + "/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Solutions",
-            "item": window.location.origin + "/solutions"
-          }
-        ]
-      }
-    ]);
-    document.head.appendChild(schemaScript);
-
     const revealObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -231,8 +134,6 @@ export default function Solutions({ navigate }: { navigate: (path: string) => vo
 
     return () => {
       revealObserver.disconnect();
-      const script = document.getElementById("solutions-structured-schema");
-      if (script) script.remove();
     };
   }, []);
 

@@ -108,9 +108,11 @@ export function Navbar({ currentPath, navigate, activeSection = "" }: NavbarProp
                   : "text-on-surface-variant hover:text-secondary"
               }`}
               aria-current={isActive("/industries") ? "page" : undefined}
+              aria-haspopup="true"
+              aria-expanded={activeDropdown === "industries"}
             >
               Industries
-              <ChevronDown size={14} className={`transition-transform duration-300 ${activeDropdown === "industries" ? "rotate-180 text-secondary" : ""}`} />
+              <ChevronDown size={14} className={`transition-transform duration-300 ${activeDropdown === "industries" ? "rotate-180 text-secondary" : ""}`} aria-hidden="true" />
             </button>
 
             {/* Mega Dropdown Panel Industries */}
@@ -194,7 +196,7 @@ export function Navbar({ currentPath, navigate, activeSection = "" }: NavbarProp
             aria-label="Toggle menu"
             aria-expanded={isMobileMenuOpen}
           >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {isMobileMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
           </button>
         </div>
       </div>

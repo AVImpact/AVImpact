@@ -34,7 +34,10 @@ export function useSEO(path: string) {
       { property: "og:type", content: config.openGraph.type },
       { property: "og:url", content: origin + (config.openGraph.url || "") },
       { property: "og:image", content: origin + config.openGraph.image },
-      { name: "twitter:card", content: config.twitter.card }
+      { name: "twitter:card", content: config.twitter.card },
+      { name: "twitter:title", content: config.openGraph.title },
+      { name: "twitter:description", content: config.openGraph.description },
+      { name: "twitter:image", content: origin + config.openGraph.image },
     ];
 
     tags.forEach((tag) => {

@@ -22,6 +22,7 @@ import { NetworkBackground } from "../components/visualizers/NetworkBackground";
 import { Footer } from "../components/layout/Footer";
 import { Navbar } from "../components/layout/Navbar";
 import { useUI } from "../contexts/UIContext";
+import { useSEO } from "../hooks/useSEO";
 
 interface ProjectItem {
   id: string;
@@ -46,78 +47,11 @@ export default function Projects({ navigate }: { navigate: (path: string) => voi
   const { openLeadModal } = useUI();
 
 
+  // Centralized SEO via useSEO hook
+  useSEO("/projects");
+
   // Track scroll position for header outline & scroll reveals
   useEffect(() => {
-    // -------------------------------------------------------------
-    // SEO & METADATA ARCHITECTURE FOR PROJECTS
-    // -------------------------------------------------------------
-    document.title = "Solution Showcases & Audio Visual Installations | AV Impact";
-    
-    // Canonical link
-    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-    if (!canonicalLink) {
-      canonicalLink = document.createElement("link");
-      canonicalLink.setAttribute("rel", "canonical");
-      document.head.appendChild(canonicalLink);
-    }
-    canonicalLink.setAttribute("href", window.location.origin + "/projects");
-
-    // Meta Description
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement("meta");
-      metaDesc.setAttribute("name", "description");
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute("content", "Explore our portfolio of representative audio visual installations and solution showcases, covering corporate boardrooms, lecture halls, and media streaming spaces.");
-
-    // Open Graph Tags
-    const ogTags = [
-      { property: "og:title", content: "Case Studies & Collaboration Technology Deployments | AV Impact" },
-      { property: "og:description", content: "Read our portfolio of audio visual integration case studies, covering corporate boardrooms and hybrid lecture halls." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: window.location.origin + "/projects" },
-      { property: "og:image", content: window.location.origin + "/assets/boardroom_after.webp" },
-      { name: "twitter:card", content: "summary_large_image" }
-    ];
-    ogTags.forEach((tag) => {
-      const selector = tag.property ? `meta[property="${tag.property}"]` : `meta[name="${tag.name}"]`;
-      let el = document.querySelector(selector);
-      if (!el) {
-        el = document.createElement("meta");
-        if (tag.property) el.setAttribute("property", tag.property);
-        if (tag.name) el.setAttribute("name", tag.name);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", tag.content);
-    });
-
-    // JSON-LD Breadcrumb Schema
-    const schemaScript = document.createElement("script");
-    schemaScript.type = "application/ld+json";
-    schemaScript.id = "projects-structured-schema";
-    schemaScript.innerHTML = JSON.stringify([
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": window.location.origin + "/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Projects",
-            "item": window.location.origin + "/projects"
-          }
-        ]
-      }
-    ]);
-    document.head.appendChild(schemaScript);
-
     let scrollRafId: number | null = null;
     const handleScroll = () => {
       if (scrollRafId !== null) return;
@@ -151,8 +85,6 @@ export default function Projects({ navigate }: { navigate: (path: string) => voi
       window.removeEventListener("scroll", handleScroll);
       if (scrollRafId !== null) cancelAnimationFrame(scrollRafId);
       revealObserver.disconnect();
-      const script = document.getElementById("projects-structured-schema");
-      if (script) script.remove();
     };
   }, []);
 

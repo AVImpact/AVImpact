@@ -6,6 +6,7 @@ import { BrandLogo } from "../components/ui/BrandLogo";
 import { CountUpNumber } from "../components/ui/CountUpNumber";
 import { ProgressRing } from "../components/ui/ProgressRing";
 import { useUI } from "../contexts/UIContext";
+import { useSEO } from "../hooks/useSEO";
 
 const homePartnerBrands = [
   { name: "Jabra", cat: "Intelligent Audio & Video", fit: "Best For: Personal & Huddle Hubs" },
@@ -446,105 +447,11 @@ export default function Home({ navigate }: HomeProps) {
     setIsMobileMenuOpen(false);
   };
 
-  // Scroll to section on hash change / mount
+  // Centralized SEO via useSEO hook
+  useSEO("/");
+
+  // Hash scroll handler
   useEffect(() => {
-    // -------------------------------------------------------------
-    // SEO & METADATA ARCHITECTURE FOR HOME PAGE
-    // -------------------------------------------------------------
-    document.title = "Audio Visual Solutions & Collaboration Technology | AV Impact";
-
-    // Canonical link
-    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-    if (!canonicalLink) {
-      canonicalLink = document.createElement("link");
-      canonicalLink.setAttribute("rel", "canonical");
-      document.head.appendChild(canonicalLink);
-    }
-    canonicalLink.setAttribute("href", window.location.origin + "/");
-
-    // Meta Description
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement("meta");
-      metaDesc.setAttribute("name", "description");
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute("content", "AV Impact designs and integrates advanced boardroom solutions, video conferencing systems, and collaboration technologies to help teams connect and make smarter decisions.");
-
-    // Open Graph Tags
-    const ogTags = [
-      { property: "og:title", content: "Audio Visual Solutions & Collaboration Technology | AV Impact" },
-      { property: "og:description", content: "AV Impact designs and integrates advanced boardroom solutions, video conferencing systems, and collaboration technologies." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: window.location.origin + "/" },
-      { property: "og:image", content: window.location.origin + "/assets/boardroom_after.webp" },
-      { name: "twitter:card", content: "summary_large_image" }
-    ];
-    ogTags.forEach((tag) => {
-      const selector = tag.property ? `meta[property="${tag.property}"]` : `meta[name="${tag.name}"]`;
-      let el = document.querySelector(selector);
-      if (!el) {
-        el = document.createElement("meta");
-        if (tag.property) el.setAttribute("property", tag.property);
-        if (tag.name) el.setAttribute("name", tag.name);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", tag.content);
-    });
-
-    // JSON-LD Organization, Local Business, and FAQ Schemas
-    const schemaScript = document.createElement("script");
-    schemaScript.type = "application/ld+json";
-    schemaScript.id = "home-structured-schema";
-    schemaScript.innerHTML = JSON.stringify([
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "AV Impact",
-        "url": window.location.origin,
-        "logo": window.location.origin + "/assets/logo.webp",
-        "sameAs": ["https://www.linkedin.com/company/av-impact"]
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": "AV Impact Indore Office",
-        "image": window.location.origin + "/assets/boardroom_after.webp",
-        "telephone": "+91-96854-53058",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "101, Balaji Heights, Geeta Bhawan",
-          "addressLocality": "Indore",
-          "addressRegion": "M.P.",
-          "postalCode": "452001",
-          "addressCountry": "IN"
-        }
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "What audio visual integration services do you offer?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "We offer smart meeting room design, video conferencing installations, HyFlex classroom solutions, auditorium presentation setups, and digital signage matrices."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Which brands do you partner with?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "AV Impact is a certified partner of global leading brands including Crestron, Q-SYS, Bose Professional, Jabra, Cisco, Logitech, and Kramer."
-            }
-          }
-        ]
-      }
-    ]);
-    document.head.appendChild(schemaScript);
-
     const handleHashScroll = () => {
       if (window.location.hash) {
         const hash = window.location.hash.substring(1);
@@ -557,8 +464,6 @@ export default function Home({ navigate }: HomeProps) {
     window.addEventListener("hashchange", handleHashScroll);
     return () => {
       window.removeEventListener("hashchange", handleHashScroll);
-      const script = document.getElementById("home-structured-schema");
-      if (script) script.remove();
     };
   }, []);
 

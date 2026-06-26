@@ -8,6 +8,8 @@ import { useRoomDesigner } from "./hooks/useRoomDesigner";
 import { useSEO } from "../../hooks/useSEO";
 import { useScrollProgress } from "../../hooks/useScrollProgress";
 import { useRevealObserver } from "../../hooks/useRevealObserver";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
+import { captureError } from "../../lib/sentry";
 
 // Subcomponents
 import { RoomVisualizer } from "./components/RoomVisualizer";
@@ -23,7 +25,7 @@ export function BrandsProducts({ navigate }: { navigate: (path: string) => void 
   useSEO("/brands-products");
   useRevealObserver();
 
-  // Helper to trigger context-based lead modal opening (Phase 5)
+  // Helper to trigger context-based lead modal opening
   const openModal = (requirementType?: string) => {
     const typeLower = requirementType?.toLowerCase() || "";
     const isSales =
@@ -34,7 +36,8 @@ export function BrandsProducts({ navigate }: { navigate: (path: string) => void 
     openLeadModal(isSales ? "sales" : "quotation", requirementType);
   };
 
-
+  const onSectionError = (error: Error) =>
+    captureError(error, { page: "brands-products" });
 
   return (
     <div className="bg-background text-on-background min-h-screen font-sans selection:bg-secondary/20 selection:text-secondary antialiased tech-grid-dots relative overflow-x-hidden">
@@ -66,11 +69,11 @@ export function BrandsProducts({ navigate }: { navigate: (path: string) => void 
 
           <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
             <div className="inline-flex items-center gap-2 bg-secondary/10 border border-secondary/20 text-secondary text-xs uppercase font-bold tracking-widest px-4 py-1.5 rounded-full mb-2 reveal">
-              <ShieldCheck size={14} className="text-secondary" />
+              <ShieldCheck size={14} className="text-secondary" aria-hidden="true" />
               Global Technology Integration
             </div>
             <h1 className="font-sans font-black text-4xl sm:text-5xl md:text-7xl text-primary tracking-tight leading-none reveal">
-              Brands & Technologies
+              Brands &amp; Technologies
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-on-surface-variant max-w-3xl mx-auto leading-relaxed font-medium reveal">
               Showcase AV Impact's ecosystem of global technology partners and enterprise-grade products that power modern workplaces, smart classrooms, command centers, healthcare, retail, and residential environments.
@@ -87,7 +90,7 @@ export function BrandsProducts({ navigate }: { navigate: (path: string) => void 
           </div>
         </section>
 
-        {/* Section 1 — What Are You Building? (Solution Recommendation Tool) */}
+        {/* Section 1 — Solution Advisor */}
         <section className="py-20 md:py-24 bg-white border-b border-gray-150 relative z-10">
           <div className="max-w-7xl mx-auto px-6 md:px-16 text-center mb-16 reveal">
             <span className="text-[11px] font-bold uppercase tracking-widest text-[#2559bd] bg-secondary/5 px-3 py-1 rounded">
@@ -101,22 +104,42 @@ export function BrandsProducts({ navigate }: { navigate: (path: string) => void 
             </p>
           </div>
 
-          <SolutionAdvisor
-            selectedSpaceId={selectedSpaceId}
-            setSelectedSpaceId={setSelectedSpaceId}
-            openModal={openModal}
-          />
+          <ErrorBoundary
+            componentName="Solution Advisor"
+            onError={onSectionError}
+          >
+            <SolutionAdvisor
+              selectedSpaceId={selectedSpaceId}
+              setSelectedSpaceId={setSelectedSpaceId}
+              openModal={openModal}
+            />
+          </ErrorBoundary>
 
           <div className="max-w-6xl mx-auto px-6 md:px-16 mt-8">
-            <RoomVisualizer selectedSpaceId={selectedSpaceId} />
+            <ErrorBoundary
+              componentName="Room Visualizer"
+              onError={onSectionError}
+            >
+              <RoomVisualizer selectedSpaceId={selectedSpaceId} />
+            </ErrorBoundary>
           </div>
         </section>
 
         {/* Section 2 — Practical Room Configurations */}
-        <RoomConfigurator />
+        <ErrorBoundary
+          componentName="Room Configurator"
+          onError={onSectionError}
+        >
+          <RoomConfigurator />
+        </ErrorBoundary>
 
-        {/* Section 4 — Supported Brand Ecosystem (Categorized Directory) */}
-        <BrandExplorer />
+        {/* Section 3 — Supported Brand Ecosystem */}
+        <ErrorBoundary
+          componentName="Brand Explorer"
+          onError={onSectionError}
+        >
+          <BrandExplorer />
+        </ErrorBoundary>
       </main>
 
       {/* Reusable Premium Footer */}

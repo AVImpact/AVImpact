@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   X, Mail, CheckCircle2, Phone, Building,
   School, Landmark, Send, ChevronRight,
@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 import { useUI } from "../../contexts/UIContext";
 import { useLeadContext } from "../../contexts/LeadContext";
+import { validateEmail } from "../../utils/validation/emailValidation";
+import { trackEvent } from "../../utils/analyticsEvents";
 
 export function LeadModal() {
   const { isLeadModalOpen, leadModalType, closeLeadModal } = useUI();
@@ -17,6 +19,8 @@ export function LeadModal() {
   const [scrollEmail, setScrollEmail] = useState("");
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [showOptionalDetails, setShowOptionalDetails] = useState(false);
+  const [scrollEmailSuggestion, setScrollEmailSuggestion] = useState<string | undefined>(undefined);
+  const [consultationEmailSuggestion, setConsultationEmailSuggestion] = useState<string | undefined>(undefined);
 
   // Form states matching Step 1 to 3 of the AV Consultation Assistant
   const [consultationData, setConsultationData] = useState({
@@ -29,9 +33,16 @@ export function LeadModal() {
     preferredContact: "Email" as "Call" | "Email" | "WhatsApp"
   });
 
+  // Ref for focus management
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
   // Reset form and lock body scroll when modal opens
   useEffect(() => {
     if (isLeadModalOpen) {
+      // Store the element that triggered the modal so we can restore focus on close
+      previousFocusRef.current = document.activeElement as HTMLElement;
+
       setSubmitted(false);
       setIsSubmitting(false);
       setSubmitError("");
@@ -39,6 +50,8 @@ export function LeadModal() {
       setScrollEmail("");
       setCurrentStep(1);
       setShowOptionalDetails(false);
+      setScrollEmailSuggestion(undefined);
+      setConsultationEmailSuggestion(undefined);
       setConsultationData({
         spaceType: "",
         roomSize: "",
@@ -49,17 +62,142 @@ export function LeadModal() {
         preferredContact: "Email"
       });
       document.body.style.overflow = "hidden";
+
+      // Fire analytics event
+      trackEvent.contactFormOpen(leadModalType);
+
+      // Move focus into the modal after it renders
+      requestAnimationFrame(() => {
+        const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        firstFocusable?.focus();
+      });
     } else {
       document.body.style.overflow = "";
+      // Restore focus to the element that opened the modal
+      previousFocusRef.current?.focus();
     }
     return () => {
       document.body.style.overflow = "";
     };
   }, [isLeadModalOpen]);
 
+  // Focus trap + Escape key handler
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!isLeadModalOpen) return;
+
+    if (e.key === "Escape") {
+      closeLeadModal();
+      return;
+    }
+
+    if (e.key === "Tab" && modalRef.current) {
+      const focusableSelectors = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      const focusable = Array.from(
+        modalRef.current.querySelectorAll<HTMLElement>(focusableSelectors)
+      ).filter((el: HTMLElement) => el.offsetParent !== null); // visible only
+
+      if (focusable.length === 0) return;
+
+      const first = focusable.at(0) as HTMLElement;
+      const last = focusable.at(-1) as HTMLElement;
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+  }, [isLeadModalOpen, closeLeadModal]);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  const handleScrollEmailBlur = () => {
+    const trimmedVal = scrollEmail.trim();
+    setScrollEmail(trimmedVal);
+    const result = validateEmail(trimmedVal);
+    if (!result.isValid) {
+      setErrors(prev => ({ ...prev, scrollEmail: result.error || "Please enter a valid email address." }));
+      setScrollEmailSuggestion(undefined);
+    } else {
+      setErrors(prev => {
+        const next = { ...prev };
+        delete next.scrollEmail;
+        return next;
+      });
+      setScrollEmailSuggestion(result.suggestion);
+    }
+  };
+
+  const handleScrollEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setScrollEmail(val);
+    
+    if (errors.scrollEmail) {
+      const result = validateEmail(val);
+      if (result.isValid) {
+        setErrors(prev => {
+          const next = { ...prev };
+          delete next.scrollEmail;
+          return next;
+        });
+        setScrollEmailSuggestion(result.suggestion);
+      }
+    } else {
+      const result = validateEmail(val);
+      setScrollEmailSuggestion(result.suggestion);
+    }
+  };
+
+  const handleConsultationEmailBlur = () => {
+    const trimmedVal = consultationData.emailAddress.trim();
+    setConsultationData(prev => ({ ...prev, emailAddress: trimmedVal }));
+    const result = validateEmail(trimmedVal);
+    if (!result.isValid) {
+      setErrors(prev => ({ ...prev, emailAddress: result.error || "Please enter a valid email address." }));
+      setConsultationEmailSuggestion(undefined);
+    } else {
+      setErrors(prev => {
+        const next = { ...prev };
+        delete next.emailAddress;
+        return next;
+      });
+      setConsultationEmailSuggestion(result.suggestion);
+    }
+  };
+
+  const handleConsultationEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setConsultationData(prev => ({ ...prev, emailAddress: val }));
+    
+    if (errors.emailAddress) {
+      const result = validateEmail(val);
+      if (result.isValid) {
+        setErrors(prev => {
+          const next = { ...prev };
+          delete next.emailAddress;
+          return next;
+        });
+        setConsultationEmailSuggestion(result.suggestion);
+      }
+    } else {
+      const result = validateEmail(val);
+      setConsultationEmailSuggestion(result.suggestion);
+    }
+  };
+
   const validateStep3 = () => {
     const newErrors: Record<string, string> = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!consultationData.fullName.trim()) {
       newErrors.fullName = "Full name is required";
@@ -71,10 +209,15 @@ export function LeadModal() {
       newErrors.mobileNumber = "Please enter a valid mobile number";
     }
 
-    if (!consultationData.emailAddress.trim()) {
-      newErrors.emailAddress = "Email address is required";
-    } else if (!emailRegex.test(consultationData.emailAddress.trim())) {
-      newErrors.emailAddress = "Please enter a valid email address";
+    const trimmedEmail = consultationData.emailAddress.trim();
+    setConsultationData(prev => ({ ...prev, emailAddress: trimmedEmail }));
+
+    const emailResult = validateEmail(trimmedEmail);
+    if (!emailResult.isValid) {
+      newErrors.emailAddress = emailResult.error || "Please enter a valid email address.";
+      setConsultationEmailSuggestion(undefined);
+    } else {
+      setConsultationEmailSuggestion(emailResult.suggestion);
     }
 
     setErrors(newErrors);
@@ -90,13 +233,15 @@ export function LeadModal() {
         spaceType: consultationData.spaceType,
         roomSize: consultationData.roomSize,
         fullName: consultationData.fullName,
-        emailAddress: consultationData.emailAddress,
+        emailAddress: consultationData.emailAddress.trim(),
         mobileNumber: consultationData.mobileNumber,
         companyName: consultationData.companyName,
         preferredContact: consultationData.preferredContact
       });
       setIsSubmitting(false);
       if (sent) {
+        trackEvent.solutionDesignerComplete(consultationData.spaceType, consultationData.roomSize);
+        trackEvent.contactFormSubmit(leadModalType, consultationData.spaceType);
         setSubmitted(true);
       } else {
         setSubmitError("We could not submit the enquiry right now. Please check the Web3Forms access key or try again.");
@@ -106,19 +251,21 @@ export function LeadModal() {
 
   const handleScrollEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!scrollEmail.trim()) {
-      setErrors({ scrollEmail: "Email address is required" });
-    } else if (!emailRegex.test(scrollEmail.trim())) {
-      setErrors({ scrollEmail: "Please enter a valid email address" });
+    const trimmedVal = scrollEmail.trim();
+    setScrollEmail(trimmedVal);
+    const result = validateEmail(trimmedVal);
+    if (!result.isValid) {
+      setErrors({ scrollEmail: result.error || "Please enter a valid email address." });
+      setScrollEmailSuggestion(undefined);
     } else {
       setIsSubmitting(true);
       setSubmitError("");
       const sent = await submitLead("scroll-email", {
-        emailAddress: scrollEmail
+        emailAddress: trimmedVal
       });
       setIsSubmitting(false);
       if (sent) {
+        trackEvent.contactFormSubmit("scroll-email");
         setSubmitted(true);
       } else {
         setSubmitError("We could not submit the enquiry right now. Please check the Web3Forms access key or try again.");
@@ -130,6 +277,7 @@ export function LeadModal() {
 
   return (
     <div
+      ref={modalRef}
       className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 overflow-y-auto"
       role="dialog"
       aria-modal="true"
@@ -234,15 +382,31 @@ export function LeadModal() {
                 <input
                   id="scroll-email-input"
                   type="email"
+                  autoComplete="email"
+                  required
                   value={scrollEmail}
-                  onChange={(e) => setScrollEmail(e.target.value)}
+                  onChange={handleScrollEmailChange}
+                  onBlur={handleScrollEmailBlur}
                   placeholder="Your Work Email"
                   className={`w-full bg-white border ${errors.scrollEmail
-                      ? 'border-rose-350 focus:ring-rose-500/20'
+                      ? 'border-rose-500 focus:ring-rose-500/20'
                       : 'border-slate-200 focus:border-blue-500/80 focus:ring-blue-500/10'
                     } text-slate-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-4 transition-all placeholder-slate-400 text-sm`}
                 />
                 {errors.scrollEmail && <p className="text-[11px] font-semibold text-rose-500 mt-1">{errors.scrollEmail}</p>}
+                {scrollEmailSuggestion && (
+                  <p className="text-[11px] text-[#2559bd] mt-1 cursor-pointer hover:underline" onClick={() => {
+                    setScrollEmail(scrollEmailSuggestion);
+                    setScrollEmailSuggestion(undefined);
+                    setErrors(prev => {
+                      const next = { ...prev };
+                      delete next.scrollEmail;
+                      return next;
+                    });
+                  }}>
+                    Did you mean <span className="font-semibold">{scrollEmailSuggestion}</span>?
+                  </p>
+                )}
               </div>
 
               {/* Submit Button */}
@@ -301,12 +465,14 @@ export function LeadModal() {
                             type="button"
                             onClick={() => {
                               setConsultationData({ ...consultationData, spaceType: item.name });
+                              trackEvent.solutionDesignerUsage(item.name);
                               setCurrentStep(2);
                             }}
                             className={`flex items-start gap-4 p-4 rounded-2xl border text-left cursor-pointer transition-all active:scale-[0.98] ${consultationData.spaceType === item.name
                                 ? 'border-blue-600 bg-blue-50/35 shadow-sm'
                                 : 'border-slate-200/80 bg-white hover:border-slate-350 hover:bg-slate-50/50'
                               }`}
+                            aria-pressed={consultationData.spaceType === item.name}
                           >
                             <div className={`p-2.5 rounded-xl shrink-0 transition-colors ${consultationData.spaceType === item.name
                                 ? 'bg-blue-600 text-white animate-pulse'
@@ -416,16 +582,32 @@ export function LeadModal() {
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                           <Mail size={16} />
                         </span>
-                        <input
-                          type="email"
-                          id="emailAddress"
-                          value={consultationData.emailAddress}
-                          onChange={(e) => setConsultationData({ ...consultationData, emailAddress: e.target.value })}
-                          placeholder="name@company.com"
-                          className={`w-full bg-white border ${errors.emailAddress ? 'border-rose-350 focus:ring-rose-500/20' : 'border-slate-200 focus:border-blue-500/80'} text-slate-900 rounded-xl pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-4 transition-all`}
-                        />
+                         <input
+                           type="email"
+                           id="emailAddress"
+                           autoComplete="email"
+                           required
+                           value={consultationData.emailAddress}
+                           onChange={handleConsultationEmailChange}
+                           onBlur={handleConsultationEmailBlur}
+                           placeholder="name@company.com"
+                           className={`w-full bg-white border ${errors.emailAddress ? 'border-rose-500 focus:ring-rose-500/20' : 'border-slate-200 focus:border-blue-500/80'} text-slate-900 rounded-xl pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-4 transition-all`}
+                         />
                       </div>
                       {errors.emailAddress && <p className="text-[10px] font-semibold text-rose-500 mt-1">{errors.emailAddress}</p>}
+                      {consultationEmailSuggestion && (
+                        <p className="text-[11px] text-[#2559bd] mt-1 cursor-pointer hover:underline" onClick={() => {
+                          setConsultationData(prev => ({ ...prev, emailAddress: consultationEmailSuggestion }));
+                          setConsultationEmailSuggestion(undefined);
+                          setErrors(prev => {
+                            const next = { ...prev };
+                            delete next.emailAddress;
+                            return next;
+                          });
+                        }}>
+                          Did you mean <span className="font-semibold">{consultationEmailSuggestion}</span>?
+                        </p>
+                      )}
                     </div>
 
                     {/* Phone Input */}

@@ -39,6 +39,7 @@ import { useSEO } from "../hooks/useSEO";
 import { useRevealObserver } from "../hooks/useRevealObserver";
 import { scrollToElement } from "../utils/scrollUtils";
 import { submitLeadToWeb3Forms } from "../services/web3forms";
+import { validateEmail } from "../utils/validation/emailValidation";
 
 export default function Contact({ navigate }: { navigate: (path: string) => void }) {
   const [formStep, setFormStep] = useState(1);
@@ -60,6 +61,37 @@ export default function Contact({ navigate }: { navigate: (path: string) => void
   const [projectTimeline, setProjectTimeline] = useState("");
   const [emailCopied, setEmailCopied] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [emailSuggestion, setEmailSuggestion] = useState<string | undefined>(undefined);
+
+  const handleEmailBlur = () => {
+    const trimmedVal = contactInfo.email.trim();
+    setContactInfo(prev => ({ ...prev, email: trimmedVal }));
+    const result = validateEmail(trimmedVal);
+    if (!result.isValid) {
+      setEmailError(result.error || "Please enter a valid email address.");
+      setEmailSuggestion(undefined);
+    } else {
+      setEmailError("");
+      setEmailSuggestion(result.suggestion);
+    }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setContactInfo(prev => ({ ...prev, email: val }));
+    
+    if (emailError) {
+      const result = validateEmail(val);
+      if (result.isValid) {
+        setEmailError("");
+        setEmailSuggestion(result.suggestion);
+      }
+    } else {
+      const result = validateEmail(val);
+      setEmailSuggestion(result.suggestion);
+    }
+  };
 
   const handleEmailClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -134,12 +166,18 @@ export default function Contact({ navigate }: { navigate: (path: string) => void
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contactInfo.name || !contactInfo.email || !contactInfo.phone || !contactInfo.city) {
-      setStepError("Please fill in all required contact fields.");
+    const trimmedEmail = contactInfo.email.trim();
+    setContactInfo(prev => ({ ...prev, email: trimmedEmail }));
+
+    const emailResult = validateEmail(trimmedEmail);
+    if (!emailResult.isValid) {
+      setEmailError(emailResult.error || "Please enter a valid email address.");
+      setEmailSuggestion(undefined);
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactInfo.email.trim())) {
-      setStepError("Please enter a valid email address.");
+
+    if (!contactInfo.name || !trimmedEmail || !contactInfo.phone || !contactInfo.city) {
+      setStepError("Please fill in all required contact fields.");
       return;
     }
     if (!/^\+?[0-9\s-]{8,15}$/.test(contactInfo.phone.trim())) {
@@ -151,7 +189,7 @@ export default function Contact({ navigate }: { navigate: (path: string) => void
     const sanitizedContactInfo = {
       name: sanitizeString(contactInfo.name),
       company: sanitizeString(contactInfo.company),
-      email: sanitizeString(contactInfo.email),
+      email: sanitizeString(trimmedEmail),
       phone: sanitizeString(contactInfo.phone),
       city: sanitizeString(contactInfo.city)
     };
@@ -601,12 +639,32 @@ export default function Contact({ navigate }: { navigate: (path: string) => void
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Email Address *</label>
                       <input
                         type="email"
+                        autocomplete="email"
                         required
                         placeholder="john@example.com"
                         value={contactInfo.email}
-                        onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
-                        className="w-full border border-slate-200 rounded-xl px-4 py-3 text-xs md:text-sm focus:border-[#2559bd] outline-none"
+                        onChange={handleEmailChange}
+                        onBlur={handleEmailBlur}
+                        className={`w-full border rounded-xl px-4 py-3 text-xs md:text-sm outline-none transition-all ${
+                          emailError 
+                            ? 'border-rose-500 focus:border-rose-500' 
+                            : 'border-slate-200 focus:border-[#2559bd]'
+                        }`}
                       />
+                      {emailError && (
+                        <p className="text-[11px] font-semibold text-rose-500 mt-1">
+                          {emailError}
+                        </p>
+                      )}
+                      {emailSuggestion && (
+                        <p className="text-[11px] text-[#2559bd] mt-1 cursor-pointer hover:underline" onClick={() => {
+                          setContactInfo(prev => ({ ...prev, email: emailSuggestion }));
+                          setEmailError("");
+                          setEmailSuggestion(undefined);
+                        }}>
+                          Did you mean <span className="font-semibold">{emailSuggestion}</span>?
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Mobile Number *</label>

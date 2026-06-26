@@ -8,6 +8,7 @@ import { NetworkBackground } from "../components/visualizers/NetworkBackground";
 import { Footer } from "../components/layout/Footer";
 import { Navbar } from "../components/layout/Navbar";
 import { useUI } from "../contexts/UIContext";
+import { useSEO } from "../hooks/useSEO";
 
 // Representative Solution Layouts with Hotspots and Realistic Environment Images
 const representativeLayouts = [
@@ -219,77 +220,10 @@ export default function Industries({ navigate }: { navigate: (path: string) => v
     return () => clearInterval(timer);
   }, [autoPlayEnabled, isPaused, currentProjectIndex]);
 
+  // Centralized SEO via useSEO hook
+  useSEO("/industries");
+
   useEffect(() => {
-    // -------------------------------------------------------------
-    // SEO & METADATA ARCHITECTURE FOR INDUSTRIES
-    // -------------------------------------------------------------
-    document.title = "Custom AV Integration by Industry Sector | AV Impact";
-
-    // Canonical link
-    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-    if (!canonicalLink) {
-      canonicalLink = document.createElement("link");
-      canonicalLink.setAttribute("rel", "canonical");
-      document.head.appendChild(canonicalLink);
-    }
-    canonicalLink.setAttribute("href", window.location.origin + "/industries");
-
-    // Meta Description
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement("meta");
-      metaDesc.setAttribute("name", "description");
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute("content", "Learn how AV Impact provides tailored audio visual and video conferencing solutions for corporate, education, healthcare, government, retail, and residential facilities.");
-
-    // Open Graph Tags
-    const ogTags = [
-      { property: "og:title", content: "Custom AV Integration by Industry Sector | AV Impact" },
-      { property: "og:description", content: "Learn how AV Impact provides tailored audio visual and video conferencing solutions for corporate, education, healthcare, government, retail, and residential facilities." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: window.location.origin + "/industries" },
-      { property: "og:image", content: window.location.origin + "/assets/boardroom_after.webp" },
-      { name: "twitter:card", content: "summary_large_image" }
-    ];
-    ogTags.forEach((tag) => {
-      const selector = tag.property ? `meta[property="${tag.property}"]` : `meta[name="${tag.name}"]`;
-      let el = document.querySelector(selector);
-      if (!el) {
-        el = document.createElement("meta");
-        if (tag.property) el.setAttribute("property", tag.property);
-        if (tag.name) el.setAttribute("name", tag.name);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", tag.content);
-    });
-
-    // JSON-LD Breadcrumb Schema
-    const schemaScript = document.createElement("script");
-    schemaScript.type = "application/ld+json";
-    schemaScript.id = "industries-structured-schema";
-    schemaScript.innerHTML = JSON.stringify([
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": window.location.origin + "/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Industries",
-            "item": window.location.origin + "/industries"
-          }
-        ]
-      }
-    ]);
-    document.head.appendChild(schemaScript);
-
     let scrollRafId: number | null = null;
     const handleScroll = () => {
       if (scrollRafId !== null) return;
@@ -323,8 +257,6 @@ export default function Industries({ navigate }: { navigate: (path: string) => v
       window.removeEventListener("scroll", handleScroll);
       if (scrollRafId !== null) cancelAnimationFrame(scrollRafId);
       revealObserver.disconnect();
-      const script = document.getElementById("industries-structured-schema");
-      if (script) script.remove();
     };
   }, []);
 
