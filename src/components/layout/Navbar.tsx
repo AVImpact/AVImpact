@@ -63,7 +63,7 @@ export function Navbar({ currentPath, navigate, activeSection = "" }: NavbarProp
 
   return (
     <header className="fixed top-0 w-full h-24 bg-glass-bg/85 backdrop-blur-md border-b border-glass-border/40 shadow-sm z-50 transition-all duration-300">
-      <div className="flex justify-between items-center px-6 md:px-16 max-w-7xl mx-auto h-full relative">
+      <div className="flex justify-between items-center px-4 sm:px-6 md:px-16 max-w-7xl mx-auto h-full relative">
         
         {/* Brand Logo */}
         <div 
@@ -74,7 +74,7 @@ export function Navbar({ currentPath, navigate, activeSection = "" }: NavbarProp
         >
           <AVImpactLogo 
             height={80} 
-            className="h-16 sm:h-20 md:h-[80px] w-auto transition-all duration-300 transform group-hover:scale-105" 
+            className="h-10 sm:h-16 md:h-[80px] w-auto transition-all duration-300 transform group-hover:scale-105" 
           />
         </div>
 
@@ -180,10 +180,10 @@ export function Navbar({ currentPath, navigate, activeSection = "" }: NavbarProp
         </nav>
 
         {/* Nav Right CTA Operations */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => handleModalOpen("quotation")}
-            className="bg-[#2559bd] text-white hover:bg-[#1f4a9e] px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 hover-scale-sm cursor-pointer"
+            className="bg-[#2559bd] text-white hover:bg-[#1f4a9e] px-2.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-[10px] sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 hover-scale-sm cursor-pointer"
             aria-label="Request consultation"
           >
             Consultation

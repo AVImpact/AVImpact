@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import { LeadModal } from "./components/forms/LeadModal";
 import { UIProvider } from "./contexts/UIContext";
 import { LeadProvider } from "./contexts/LeadContext";
@@ -59,6 +60,9 @@ export default function App() {
             {/* Global modal singleton */}
             <LeadModal />
             <AppRoutes />
+
+            {/* Vercel Analytics — tracks page views automatically */}
+            <Analytics />
 
             {/* Sleek, persistent floating Company Profile download circle in the bottom-right corner */}
             <a

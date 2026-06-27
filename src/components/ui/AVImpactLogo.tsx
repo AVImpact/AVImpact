@@ -28,7 +28,7 @@ export const AVImpactLogo = React.memo(function AVImpactLogo({ className = "", h
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 680 180"
-        style={{ height: typeof height === "number" ? `${height}px` : height }}
+        height={height}
         className={`inline-block select-none object-contain ${className}`}
         aria-label="AV Impact Logo"
       >
@@ -87,7 +87,7 @@ export const AVImpactLogo = React.memo(function AVImpactLogo({ className = "", h
     <img
       src={imgSrc}
       alt="AV Impact Logo"
-      style={imageStyle}
+      height={height}
       className={`inline-block select-none object-contain ${className}`}
       onError={handleError}
       referrerPolicy="no-referrer"
